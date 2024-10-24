@@ -29,6 +29,9 @@ export function StatsDisplay() {
         </h3>
         <p className="text-2xl font-bold mt-1">
           {results.totalEthBurnt.toFixed(2)} ETH
+        <span className="text-sm text-red-500 ml-2">
+          {results.ethBurntPercentagePerYear.toFixed(3)}%/year
+        </span>
         </p>
       </div>
 

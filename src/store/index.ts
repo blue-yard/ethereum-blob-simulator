@@ -38,6 +38,7 @@ export const useStore = create<SimulatorStore>((set, get) => {
       totalTps: 0,
       avgTxPrice: 0,
       totalEthBurnt: 0,
+      ethBurntPercentagePerYear: 0,
       totalUSDBurnt: 0,
       timeSeriesData: []
     },

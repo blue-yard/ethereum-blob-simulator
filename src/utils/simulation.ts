@@ -21,6 +21,7 @@ const BLOCK_TIME = 12 // seconds
 const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 const WEI_PER_ETH = BigInt(1e18)
 const MINIMUM_BLOB_FEE = BigInt(1e9)
+const TOTAL_ETH = 120_000_000
 
 function calculateTransactionsPerBlob(txBytes: number): number {
   return Math.floor(BLOB_SIZE / txBytes)
@@ -124,6 +125,8 @@ export function calculateSimulationResults(params: SimulationParams) {
   // Calculate total ETH burnt per day
   const blocksPerDay = 24 * 3600 / BLOCK_TIME
   const ethBurntPerDay = lastPoint.blobBaseFee * lastPoint.blobsPerBlock * blocksPerDay / 1e9
+  const ethBurntPerYear = ethBurntPerDay * 365
+  const ethBurntPercentagePerYear = ethBurntPerYear / TOTAL_ETH * 100
   
   // Total TPS is just rollups * TPS per rollup
   const totalTps = params.rollupCount * params.tpsPerRollup
@@ -133,6 +136,7 @@ export function calculateSimulationResults(params: SimulationParams) {
     avgTxPrice: weiToUsd(BigInt(Math.floor(lastPoint.blobBaseFee * 1e9)), params.ethPrice) / 
                 calculateTransactionsPerBlob(params.txBytes),
     totalEthBurnt: ethBurntPerDay,
+    ethBurntPercentagePerYear,
     totalUSDBurnt: ethBurntPerDay * params.ethPrice,
     timeSeriesData
   }
