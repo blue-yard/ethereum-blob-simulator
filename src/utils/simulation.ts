@@ -20,7 +20,6 @@ const BLOB_SIZE = 128 * 1024 // 128KB in bytes
 const BLOCK_TIME = 12 // seconds
 const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 const WEI_PER_ETH = BigInt(1e18)
-const GWEI_PER_ETH = BigInt(1e9)
 const MINIMUM_BLOB_FEE = BigInt(1e9)
 
 function calculateTransactionsPerBlob(txBytes: number): number {

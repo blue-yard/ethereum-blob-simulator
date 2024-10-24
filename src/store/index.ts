@@ -42,14 +42,14 @@ export const useStore = create<SimulatorStore>((set, get) => {
       timeSeriesData: []
     },
 
-    setControl: (key, value) => {
+    setControl: (key: any, value: any) => {
       set(state => ({
         controls: { ...state.controls, [key]: value }
       }))
       get().updateResults()
     },
 
-    setGasCostGrid: (row, col, value) => {
+    setGasCostGrid: (row: number, col: number, value: number) => {
       set(state => {
         const newGrid = [...state.gasCostGrid.grid]
         newGrid[row][col] = value

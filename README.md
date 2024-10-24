@@ -1,13 +1,14 @@
-# Ethereum Blob Space Simulator
+# Ethereum Blob Simulator
 
 This simulator helps visualize and understand how Ethereum's blob space market dynamics work, particularly focusing on the relationship between blob fees, transaction throughput, and user behavior.
 
 ## Live Demo
-Try it out here: [Ethereum Blob Space Simulator](https://blue-yard.github.io/ethereum-blob-simulator)
+Try it out here: [Ethereum Blob Simulator](https://blue-yard.github.io/ethereum-blob-simulator)
 
 ## Overview
 
 The simulator models how Layer 2 rollups use Ethereum's blob space, taking into account:
+
 - Number of rollups and their TPS requirements
 - User price sensitivity for transactions
 - Blob space availability and pricing mechanics
@@ -26,7 +27,7 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
 - Each blob can hold 128KB of data
 - Each transaction uses an average of 180 bytes
 - Blobs are posted every 12 seconds (1 block)
-- The base fee for blobs starts at 1 wei and adjusts based on demand
+- The base fee for blobs starts at 1 gwei and adjusts based on demand
 - When blob usage exceeds the target, fees increase by 12.5%
 
 ### User Controls
