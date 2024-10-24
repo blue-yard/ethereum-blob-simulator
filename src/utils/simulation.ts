@@ -74,6 +74,7 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
   const txPerBlob = calculateTransactionsPerBlob(params.txBytes)
   const totalPotentialTps = params.rollupCount * params.tpsPerRollup
   const blocksPerHour = Math.floor(3600 / BLOCK_TIME) // Calculate number of blocks in an hour
+  const maxTps = txPerBlob * params.maxBlobsPerBlock;
   
   // Start with minimum blob fee (1 wei or 1 gwei)
   let currentBlobFee = MINIMUM_BLOB_FEE
@@ -86,7 +87,7 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
     // Update TPS based on willing users before calculating required blobs
     const willingUsers = getWillingUsers(txPriceUsd, params.gasCostGrid)
     console.log("tx Price: ", txPriceUsd, " willing users: ", willingUsers)
-    currentTps = totalPotentialTps * willingUsers
+    currentTps = Math.min(maxTps, totalPotentialTps * willingUsers)
     
     // Calculate required blobs based on current TPS
     let requiredBlobs = Math.min(
