@@ -9,7 +9,7 @@ For example, here's how Ethereum will function with 16MB blobs doing 10k TPS:
 Fwoah that's a lot of burn!
 
 ## Live Demo
-Try it out here: [Ethereum Blob Simulator](https://blue-yard.github.io/ethereum-blob-simulator)
+Try it out here: [Ethereum Blob Simulator](https://ethereum-blob-simulator.netlify.app/)
 
 ## Overview
 
