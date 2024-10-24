@@ -2,6 +2,12 @@
 
 This simulator helps visualize and understand how Ethereum's blob space market dynamics work, particularly focusing on the relationship between blob fees, transaction throughput, and user behavior.
 
+For example, here's how Ethereum will function with 16MB blobs doing 10k TPS:
+
+![](/16mb-10ktps.png)
+
+Fwoah that's a lot of burn!
+
 ## Live Demo
 Try it out here: [Ethereum Blob Simulator](https://blue-yard.github.io/ethereum-blob-simulator)
 
