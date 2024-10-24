@@ -21,6 +21,7 @@ const BLOCK_TIME = 12 // seconds
 const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 const WEI_PER_ETH = BigInt(1e18)
 const GWEI_PER_ETH = BigInt(1e9)
+const MINIMUM_BLOB_FEE = BigInt(1e9)
 
 function calculateTransactionsPerBlob(txBytes: number): number {
   return Math.floor(BLOB_SIZE / txBytes)
@@ -76,7 +77,7 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
   const blocksPerHour = Math.floor(3600 / BLOCK_TIME) // Calculate number of blocks in an hour
   
   // Start with minimum blob fee (1 wei or 1 gwei)
-  let currentBlobFee = BigInt(params.useMinimumBlobFee ? 1e9 : 1e9)
+  let currentBlobFee = MINIMUM_BLOB_FEE
   let currentTps = totalPotentialTps
   
   for (let blockNumber = 0; blockNumber < blocksPerHour; blockNumber++) {
@@ -106,7 +107,11 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
       currentBlobFee = currentBlobFee * BigInt(1125) / BigInt(1000) // Exact 12.5% increase
     } else if (requiredBlobs < params.targetBlobsPerBlock) {
       currentBlobFee = currentBlobFee * BigInt(1000) / BigInt(1125) // Exact 12.5% decrease
+      if (currentBlobFee < MINIMUM_BLOB_FEE) {
+        currentBlobFee = MINIMUM_BLOB_FEE
+      }
     }   
+
   }
   
   return points

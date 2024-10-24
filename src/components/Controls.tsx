@@ -29,7 +29,7 @@ export function Controls() {
           value={controls.targetBlobsPerBlock}
           onChange={(value) => setControl('targetBlobsPerBlock', value)}
           min={1}
-          max={100}
+          max={128}
         />
         
         <Slider
@@ -37,7 +37,7 @@ export function Controls() {
           value={controls.maxBlobsPerBlock}
           onChange={(value) => setControl('maxBlobsPerBlock', value)}
           min={1}
-          max={200}
+          max={256}
         />
         
         <Slider

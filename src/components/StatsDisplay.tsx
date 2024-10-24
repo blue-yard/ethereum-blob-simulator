@@ -7,7 +7,7 @@ export function StatsDisplay() {
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          Desired TPS
+          TPS Demand
         </h3>
         <p className="text-2xl font-bold mt-1">
           {results.totalTps.toLocaleString()}
@@ -37,7 +37,7 @@ export function StatsDisplay() {
           Total USD Burnt per Day
         </h3>
         <p className="text-2xl font-bold mt-1">
-          {results.totalUSDBurnt.toFixed(2)} USD
+          ${results.totalUSDBurnt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
       </div>
     </div>
