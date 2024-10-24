@@ -78,10 +78,10 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
     
     // Update blob fee for next block if above target
     if (requiredBlobs > params.targetBlobsPerBlock) {
-      console.log("increasing blob fee");
       currentBlobFee = currentBlobFee * BigInt(1125) / BigInt(1000) // Exact 12.5% increase
-    }
-    console.log("current blob fee: ", currentBlobFee)
+    } else if (requiredBlobs < params.targetBlobsPerBlock) {
+      currentBlobFee = currentBlobFee * BigInt(1000) / BigInt(1125) // Exact 12.5% decrease
+    }   
   }
   
   return points
@@ -103,6 +103,7 @@ export function calculateSimulationResults(params: SimulationParams) {
     avgTxPrice: weiToUsd(BigInt(Math.floor(lastPoint.blobBaseFee * 1e9)), params.ethPrice) / 
                 calculateTransactionsPerBlob(params.txBytes),
     totalEthBurnt: ethBurntPerDay,
+    totalUSDBurnt: ethBurntPerDay * params.ethPrice,
     timeSeriesData
   }
 }
