@@ -7,8 +7,7 @@ interface VerticalSliderProps {
 }
 
 export function VerticalSlider({ value, onChange, min, max, height = "200px" }: VerticalSliderProps) {
-  // Invert the value since we're flipping the slider
-  const invertedValue = max - (value - min)
+
   
   return (
     <div 
@@ -19,8 +18,8 @@ export function VerticalSlider({ value, onChange, min, max, height = "200px" }: 
         type="range"
         min={min}
         max={max}
-        value={invertedValue}
-        onChange={(e) => onChange(max - (Number(e.target.value) - min))}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
         className="accent-primary"
         style={{
           width: "1000px",

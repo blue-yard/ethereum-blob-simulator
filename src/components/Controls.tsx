@@ -13,7 +13,7 @@ export function Controls() {
           value={controls.rollupCount}
           onChange={(value) => setControl('rollupCount', value)}
           min={1}
-          max={100}
+          max={1000}
         />
         
         <Slider
@@ -51,16 +51,28 @@ export function Controls() {
         />
         
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Average Gas Fee</label>
-          <select 
-            value={controls.averageGasFee}
-            onChange={(e) => setControl('averageGasFee', Number(e.target.value))}
+          <label className="text-sm font-medium">Transaction Bytes</label>
+          <input
+            type="number"
+            value={controls.txBytes}
+            onChange={(e) => setControl('txBytes', Number(e.target.value))}
             className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
-          >
-            <option value={21000}>ETH Transfer (21,000)</option>
-            <option value={65000}>ERC20 Transfer (65,000)</option>
-            <option value={150000}>NFT Purchase (150,000)</option>
-          </select>
+            min={1}
+            max={1000}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="minimumBlobFee"
+            checked={controls.useMinimumBlobFee}
+            onChange={(e) => setControl('useMinimumBlobFee', e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <label htmlFor="minimumBlobFee" className="text-sm font-medium">
+            Use Minimum Blob Fee (1 gwei instead of 1 wei)
+          </label>
         </div>
       </div>
       <GasCostGrid />

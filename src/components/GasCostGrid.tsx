@@ -8,9 +8,7 @@ export function GasCostGrid() {
   const { gasCostGrid, setGasCostGrid } = useStore()
 
   const handleSliderChange = (colIndex: number, value: number) => {
-    for (let rowIndex = 0; rowIndex < 10; rowIndex++) {
-      setGasCostGrid(rowIndex, colIndex, value)
-    }
+      setGasCostGrid(0, colIndex, value)
   }
 
   const formatPrice = (price: number) => {

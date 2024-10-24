@@ -4,7 +4,8 @@ interface SimulationParams {
   targetBlobsPerBlock: number
   maxBlobsPerBlock: number
   ethPrice: number
-  averageGasFee: number
+  txBytes: number
+  useMinimumBlobFee: boolean
   gasCostGrid: number[][]
 }
 
@@ -12,78 +13,95 @@ interface TimePoint {
   timestamp: number
   blobsPerBlock: number
   blobBaseFee: number
+  actualTps: number
 }
 
-export function calculateBlobFee(blobsPerBlock: number, targetBlobsPerBlock: number): number {
-  // EIP-4844 blob base fee formula
-  // If we're at target, fee is 1 gwei
-  // Fee doubles for each doubling of blob usage
-  const ratio = blobsPerBlock / targetBlobsPerBlock
-  return Math.pow(2, Math.log2(ratio)) // in gwei
+const BLOB_SIZE = 128 * 1024 // 128KB in bytes
+const BLOCK_TIME = 12 // seconds
+const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+const WEI_PER_ETH = BigInt(1e18)
+const GWEI_PER_ETH = BigInt(1e9)
+
+function calculateTransactionsPerBlob(txBytes: number): number {
+  return Math.floor(BLOB_SIZE / txBytes)
 }
 
-export function findEquilibriumPoint(params: SimulationParams): number {
-  const totalTps = params.rollupCount * params.tpsPerRollup
-  const blobCapacity = 128 * 1024 // bytes per blob
-  const txSize = 100 // average tx size in bytes
-  const txPerBlob = blobCapacity / txSize
-  
-  // Start with minimum blobs needed
-  let blobsNeeded = (totalTps * 12) / (txPerBlob * 7200) // 12s per block, 7200 blocks per day
-  let blobFee = calculateBlobFee(blobsNeeded, params.targetBlobsPerBlock)
-  
-  // Convert gwei to USD
-  const feeInUsd = (blobFee * params.ethPrice) / 1e9
-  
-  // Find what percentage of users will pay this price
-  const pricePoints = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
-  let priceIndex = pricePoints.findIndex(p => feeInUsd <= p)
-  if (priceIndex === -1) priceIndex = pricePoints.length - 1
-  
-  // Use the gas cost grid to determine percentage of users willing to pay
-  const willingToPay = params.gasCostGrid[0][priceIndex] / 100
-  
-  // Adjust blobs needed based on willing users
-  return blobsNeeded * willingToPay
+function calculateRequiredBlobs(tps: number, txPerBlob: number): number {
+  return Math.ceil((tps * BLOCK_TIME) / txPerBlob)
 }
 
-export function generateTimeSeriesData(params: SimulationParams, hours: number = 24): TimePoint[] {
-  const equilibriumBlobs = findEquilibriumPoint(params)
+function weiToUsd(weiAmount: bigint, ethPriceUsd: number): number {
+  return Number(weiAmount) * ethPriceUsd / Number(WEI_PER_ETH)
+}
+
+function getWillingUsers(priceUSD: number, gasCostGrid: number[][]): number {
+  const priceIndex = PRICE_POINTS.findIndex(p => priceUSD <= p)
+  if (priceIndex === -1) return 0
+  
+  // All rows have the same value for each price point in our implementation
+  const percentWilling = gasCostGrid[0][priceIndex]
+  return percentWilling / 100
+}
+
+export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
+  console.log("params: ", params);
   const points: TimePoint[] = []
-  const intervalsPerHour = 4
+  const txPerBlob = calculateTransactionsPerBlob(params.txBytes)
+  const totalPotentialTps = params.rollupCount * params.tpsPerRollup
+  const blocksPerHour = Math.floor(3600 / BLOCK_TIME) // Calculate number of blocks in an hour
   
-  for (let i = 0; i <= hours * intervalsPerHour; i++) {
-    const timestamp = i * (3600 / intervalsPerHour) // seconds since start
-    const progress = Math.min(1, i / (intervalsPerHour * 2)) // Reach equilibrium in 2 hours
-    const blobsPerBlock = equilibriumBlobs * progress
-    const blobBaseFee = calculateBlobFee(blobsPerBlock, params.targetBlobsPerBlock)
+  // Start with minimum blob fee (1 wei or 1 gwei)
+  let currentBlobFee = BigInt(params.useMinimumBlobFee ? 1e9 : 1e9)
+  let currentTps = totalPotentialTps
+  
+  for (let blockNumber = 0; blockNumber < blocksPerHour; blockNumber++) {
+    // Calculate price per transaction in USD first
+    const txPriceUsd = weiToUsd(currentBlobFee, params.ethPrice) / txPerBlob
     
+    // Update TPS based on willing users before calculating required blobs
+    const willingUsers = getWillingUsers(txPriceUsd, params.gasCostGrid)
+    console.log("tx Price: ", txPriceUsd, " willing users: ", willingUsers)
+    currentTps = totalPotentialTps * willingUsers
+    
+    // Calculate required blobs based on current TPS
+    let requiredBlobs = Math.min(
+      calculateRequiredBlobs(currentTps, txPerBlob),
+      params.maxBlobsPerBlock
+    )
+
     points.push({
-      timestamp,
-      blobsPerBlock,
-      blobBaseFee
+      timestamp: blockNumber,
+      blobsPerBlock: requiredBlobs,
+      blobBaseFee: Number(currentBlobFee) / 1e9, // Convert to gwei for display
+      actualTps: currentTps
     })
+    
+    // Update blob fee for next block if above target
+    if (requiredBlobs > params.targetBlobsPerBlock) {
+      console.log("increasing blob fee");
+      currentBlobFee = currentBlobFee * BigInt(1125) / BigInt(1000) // Exact 12.5% increase
+    }
+    console.log("current blob fee: ", currentBlobFee)
   }
   
   return points
 }
 
 export function calculateSimulationResults(params: SimulationParams) {
-  const equilibriumBlobs = findEquilibriumPoint(params)
-  const blobBaseFee = calculateBlobFee(equilibriumBlobs, params.targetBlobsPerBlock)
   const timeSeriesData = generateTimeSeriesData(params)
-  
-  // Calculate average transaction price in USD
-  const avgTxPriceInGwei = blobBaseFee + params.averageGasFee
-  const avgTxPriceInUsd = (avgTxPriceInGwei * params.ethPrice) / 1e9
+  const lastPoint = timeSeriesData[timeSeriesData.length - 1]
   
   // Calculate total ETH burnt per day
-  const blocksPerDay = 7200 // 12 seconds per block
-  const ethBurntPerDay = (blobBaseFee * equilibriumBlobs * blocksPerDay) / 1e9
+  const blocksPerDay = 24 * 3600 / BLOCK_TIME
+  const ethBurntPerDay = lastPoint.blobBaseFee * lastPoint.blobsPerBlock * blocksPerDay / 1e9
+  
+  // Total TPS is just rollups * TPS per rollup
+  const totalTps = params.rollupCount * params.tpsPerRollup
   
   return {
-    totalTps: params.rollupCount * params.tpsPerRollup,
-    avgTxPrice: avgTxPriceInUsd,
+    totalTps, // Use the direct calculation instead of the last point
+    avgTxPrice: weiToUsd(BigInt(Math.floor(lastPoint.blobBaseFee * 1e9)), params.ethPrice) / 
+                calculateTransactionsPerBlob(params.txBytes),
     totalEthBurnt: ethBurntPerDay,
     timeSeriesData
   }

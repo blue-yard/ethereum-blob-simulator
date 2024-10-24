@@ -6,7 +6,7 @@ interface SimulatorStore {
   // Controls
   controls: SimulationControls
   gasCostGrid: GasCostGrid
-  setControl: (key: keyof SimulationControls, value: number) => void
+  setControl: (key: keyof SimulationControls, value: number | boolean) => void
   setGasCostGrid: (row: number, col: number, value: number) => void
   
   // Results
@@ -16,49 +16,59 @@ interface SimulatorStore {
 
 const DEFAULT_CONTROLS: SimulationControls = {
   rollupCount: 10,
-  tpsPerRollup: 100,
+  tpsPerRollup: 10,
   targetBlobsPerBlock: 3,
   maxBlobsPerBlock: 6,
   ethPrice: 3000,
-  averageGasFee: 21000
+  txBytes: 180,
+  useMinimumBlobFee: false
 }
+
+const DEFAULT_GRID_VALUES = [100, 90, 80, 50, 20, 5, 1]
 
 const createDefaultGrid = (): number[][] => {
-  return Array(10).fill(0).map(() => Array(7).fill(50))
+  return Array(10).fill(0).map(() => [...DEFAULT_GRID_VALUES])
 }
 
-export const useStore = create<SimulatorStore>((set, get) => ({
-  controls: DEFAULT_CONTROLS,
-  gasCostGrid: { grid: createDefaultGrid() },
-  results: {
-    totalTps: 0,
-    avgTxPrice: 0,
-    totalEthBurnt: 0,
-    timeSeriesData: []
-  },
+export const useStore = create<SimulatorStore>((set, get) => {
+  const store = {
+    controls: DEFAULT_CONTROLS,
+    gasCostGrid: { grid: createDefaultGrid() },
+    results: {
+      totalTps: 0,
+      avgTxPrice: 0,
+      totalEthBurnt: 0,
+      timeSeriesData: []
+    },
 
-  setControl: (key, value) => {
-    set(state => ({
-      controls: { ...state.controls, [key]: value }
-    }))
-    get().updateResults()
-  },
+    setControl: (key, value) => {
+      set(state => ({
+        controls: { ...state.controls, [key]: value }
+      }))
+      get().updateResults()
+    },
 
-  setGasCostGrid: (row, col, value) => {
-    set(state => {
-      const newGrid = [...state.gasCostGrid.grid]
-      newGrid[row][col] = value
-      return { gasCostGrid: { grid: newGrid } }
-    })
-    get().updateResults()
-  },
+    setGasCostGrid: (row, col, value) => {
+      set(state => {
+        const newGrid = [...state.gasCostGrid.grid]
+        newGrid[row][col] = value
+        return { gasCostGrid: { grid: newGrid } }
+      })
+      get().updateResults()
+    },
 
-  updateResults: () => {
-    const state = get()
-    const results = calculateSimulationResults({
-      ...state.controls,
-      gasCostGrid: state.gasCostGrid.grid
-    })
-    set({ results })
+    updateResults: () => {
+      const state = get()
+      const results = calculateSimulationResults({
+        ...state.controls,
+        gasCostGrid: state.gasCostGrid.grid
+      })
+      set({ results })
+    }
   }
-}))
+
+  // Calculate initial results immediately
+  setTimeout(() => store.updateResults(), 0)
+  
+  return store
+})
