@@ -61,19 +61,6 @@ export function Controls() {
             max={1000}
           />
         </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="minimumBlobFee"
-            checked={controls.useMinimumBlobFee}
-            onChange={(e) => setControl('useMinimumBlobFee', e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-          />
-          <label htmlFor="minimumBlobFee" className="text-sm font-medium">
-            Use Minimum Blob Fee (1 gwei instead of 1 wei)
-          </label>
-        </div>
       </div>
       <GasCostGrid />
     </div>

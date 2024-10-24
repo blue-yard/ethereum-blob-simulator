@@ -2,13 +2,14 @@
 
 This simulator helps visualize and understand how Ethereum's blob space market dynamics work, particularly focusing on the relationship between blob fees, transaction throughput, and user behavior.
 
-For example, here's how Ethereum will function with 16MB blobs doing 10k TPS:
+For example, here's how Ethereum will function with 16MB of blobs per block doing 10k TPS:
 
 ![](/16mb-10ktps.png)
 
 Fwoah that's a lot of burn!
 
 ## Live Demo
+
 Try it out here: [Ethereum Blob Simulator](https://ethereum-blob-simulator.netlify.app/)
 
 ## Overview
@@ -20,12 +21,6 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
 - Blob space availability and pricing mechanics
 - Dynamic fee adjustments based on demand
 
-## Key Features
-
-- Real-time simulation of blob space usage and pricing
-- Interactive controls for key parameters
-- Visual representation of market dynamics
-- Price sensitivity modeling through user-defined curves
 
 ## How It Works
 
@@ -33,8 +28,9 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
 - Each blob can hold 128KB of data
 - Each transaction uses an average of 180 bytes
 - Blobs are posted every 12 seconds (1 block)
-- The base fee for blobs starts at 1 gwei and adjusts based on demand
-- When blob usage exceeds the target, fees increase by 12.5%
+- The base fee for blobs starts at 1 gwei (this assumes [EIP-7762](https://ethereum-magicians.org/t/eip-7762-increase-min-base-fee-per-blob-gas/20949) has been implemented) and adjusts based on demand.
+- When blob usage exceeds the target, fees increase by 12.5%, when they are below target fees decrease by 12.5%
+- Eventually total blobs reaches a steady state based on how much users are willing to pay for transactions vs blob base fees. 
 
 ### User Controls
 
@@ -55,15 +51,15 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
 ### Display Metrics
 
 1. **Key Statistics**
-   - Desired TPS (total theoretical throughput)
+   - TPS Demand - What would the TPS be if transactions were < $0.0001
    - Average transaction price
-   - Total ETH burnt per day
+   - Total ETH burnt per day, with yearly burn as a percentage in red. 
    - Total USD value burnt per day
 
 2. **Real-time Graphs**
    - Blobs per block
    - Blob base fee in gwei
-   - Actual TPS achieved
+   - Current TPS
 
 
 ## Development
@@ -89,4 +85,4 @@ npm run preview
 
 ## Deployment
 
-The simulator is automatically deployed to GitHub Pages when changes are pushed to the main branch.
+The simulator is automatically deployed to Netlify, [you can see it here]((https://ethereum-blob-simulator.netlify.app/))

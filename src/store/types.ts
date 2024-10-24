@@ -16,6 +16,7 @@ export interface SimulationResults {
   totalTps: number
   avgTxPrice: number
   totalEthBurnt: number
+  ethBurntPercentagePerYear: number
   totalUSDBurnt: number
   timeSeriesData: {
     timestamp: number
