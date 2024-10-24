@@ -2,6 +2,9 @@
 
 This simulator helps visualize and understand how Ethereum's blob space market dynamics work, particularly focusing on the relationship between blob fees, transaction throughput, and user behavior.
 
+## Live Demo
+Try it out here: [Ethereum Blob Space Simulator](https://blue-yard.github.io/ethereum-blob-simulator)
+
 ## Overview
 
 The simulator models how Layer 2 rollups use Ethereum's blob space, taking into account:
@@ -55,7 +58,8 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
    - Blob base fee in gwei
    - Actual TPS achieved
 
-## Running the Project
+
+## Development
 
 1. Install dependencies:
 
@@ -75,3 +79,7 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## Deployment
+
+The simulator is automatically deployed to GitHub Pages when changes are pushed to the main branch.
