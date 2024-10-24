@@ -21,7 +21,7 @@ export function Controls() {
           value={controls.tpsPerRollup}
           onChange={(value) => setControl('tpsPerRollup', value)}
           min={1}
-          max={1000}
+          max={500}
         />
         
         <Slider
@@ -29,7 +29,7 @@ export function Controls() {
           value={controls.targetBlobsPerBlock}
           onChange={(value) => setControl('targetBlobsPerBlock', value)}
           min={1}
-          max={12}
+          max={100}
         />
         
         <Slider
@@ -37,7 +37,7 @@ export function Controls() {
           value={controls.maxBlobsPerBlock}
           onChange={(value) => setControl('maxBlobsPerBlock', value)}
           min={1}
-          max={12}
+          max={200}
         />
         
         <Slider

@@ -34,13 +34,38 @@ function weiToUsd(weiAmount: bigint, ethPriceUsd: number): number {
   return Number(weiAmount) * ethPriceUsd / Number(WEI_PER_ETH)
 }
 
-function getWillingUsers(priceUSD: number, gasCostGrid: number[][]): number {
-  const priceIndex = PRICE_POINTS.findIndex(p => priceUSD <= p)
-  if (priceIndex === -1) return 0
+function interpolatePercentage(price: number, gasCostGrid: number[][]): number {
+  // Find the two price points we're between
+  let lowerIndex = PRICE_POINTS.findIndex(p => price <= p)
   
-  // All rows have the same value for each price point in our implementation
-  const percentWilling = gasCostGrid[0][priceIndex]
-  return percentWilling / 100
+  // If price is higher than our highest price point
+  if (lowerIndex === -1) return 0
+  
+  // If price is lower than our lowest price point
+  if (lowerIndex === 0) return gasCostGrid[0][0] / 100
+  
+  // Get the two price points and their corresponding percentages
+  const lowerPrice = PRICE_POINTS[lowerIndex - 1]
+  const upperPrice = PRICE_POINTS[lowerIndex]
+  const lowerPercentage = gasCostGrid[0][lowerIndex - 1]
+  const upperPercentage = gasCostGrid[0][lowerIndex]
+  
+  // Calculate where we are between the two price points (in log space)
+  const logPrice = Math.log10(price)
+  const logLower = Math.log10(lowerPrice)
+  const logUpper = Math.log10(upperPrice)
+  
+  // Linear interpolation in log space
+  const t = (logPrice - logLower) / (logUpper - logLower)
+  
+  // Interpolate the percentage
+  const percentage = lowerPercentage + (upperPercentage - lowerPercentage) * t
+  
+  return percentage / 100
+}
+
+function getWillingUsers(priceUSD: number, gasCostGrid: number[][]): number {
+  return interpolatePercentage(priceUSD, gasCostGrid)
 }
 
 export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {

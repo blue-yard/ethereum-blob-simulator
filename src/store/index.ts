@@ -15,7 +15,7 @@ interface SimulatorStore {
 }
 
 const DEFAULT_CONTROLS: SimulationControls = {
-  rollupCount: 10,
+  rollupCount: 20,
   tpsPerRollup: 10,
   targetBlobsPerBlock: 3,
   maxBlobsPerBlock: 6,
@@ -24,7 +24,7 @@ const DEFAULT_CONTROLS: SimulationControls = {
   useMinimumBlobFee: false
 }
 
-const DEFAULT_GRID_VALUES = [100, 90, 80, 50, 20, 5, 1]
+const DEFAULT_GRID_VALUES = [100, 95, 90, 75, 20, 5, 1]
 
 const createDefaultGrid = (): number[][] => {
   return Array(10).fill(0).map(() => [...DEFAULT_GRID_VALUES])
