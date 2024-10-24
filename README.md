@@ -1,50 +1,77 @@
-# React + TypeScript + Vite
+# Ethereum Blob Space Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This simulator helps visualize and understand how Ethereum's blob space market dynamics work, particularly focusing on the relationship between blob fees, transaction throughput, and user behavior.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The simulator models how Layer 2 rollups use Ethereum's blob space, taking into account:
+- Number of rollups and their TPS requirements
+- User price sensitivity for transactions
+- Blob space availability and pricing mechanics
+- Dynamic fee adjustments based on demand
 
-## Expanding the ESLint configuration
+## Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Real-time simulation of blob space usage and pricing
+- Interactive controls for key parameters
+- Visual representation of market dynamics
+- Price sensitivity modeling through user-defined curves
 
-- Configure the top-level `parserOptions` property like this:
+## How It Works
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Blob Space Mechanics
+- Each blob can hold 128KB of data
+- Each transaction uses an average of 180 bytes
+- Blobs are posted every 12 seconds (1 block)
+- The base fee for blobs starts at 1 wei and adjusts based on demand
+- When blob usage exceeds the target, fees increase by 12.5%
+
+### User Controls
+
+1. **Basic Parameters**
+   - Number of rollups (1-1000)
+   - TPS per rollup (1-500)
+   - Target blobs per block (1-100)
+   - Max blobs per block (1-200)
+   - ETH price in USD
+   - Transaction size in bytes
+   - Minimum blob fee toggle (1 gwei vs 1 wei)
+
+2. **Price Sensitivity Grid**
+   - Vertical sliders showing percentage of users willing to transact at different price points
+   - Price points range from $0.0001 to $100
+   - Percentages interpolate smoothly between points
+
+### Display Metrics
+
+1. **Key Statistics**
+   - Desired TPS (total theoretical throughput)
+   - Average transaction price
+   - Total ETH burnt per day
+   - Total USD value burnt per day
+
+2. **Real-time Graphs**
+   - Blobs per block
+   - Blob base fee in gwei
+   - Actual TPS achieved
+
+## Running the Project
+
+1. Install dependencies:
+
+```bash
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2. Start the development server:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```bash
+npm run dev
+```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+3. Build for production:
+
+```bash
+npm run build
+npm run preview
 ```
