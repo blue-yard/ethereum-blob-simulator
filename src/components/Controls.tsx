@@ -131,15 +131,44 @@ export function Controls() {
         </button>
         
         {isInsaneModeOpen && (
-          <div className="p-4">
-            <button
-              onClick={() => setIsInsaneMode(!isInsaneMode)}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95 border-2 border-red-400 hover:border-red-500"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-xl">🔥 INSANE MODE {isInsaneMode ? 'ON' : 'OFF'} 🔥</span>
+          <div className="p-4 space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div>
+                <label className="font-medium">Fee Jitter</label>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Add random variation to user fee preferences
+                </p>
               </div>
-            </button>
+              <button
+                onClick={() => setControl('useRandomJitter', !controls.useRandomJitter)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  controls.useRandomJitter 
+                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {controls.useRandomJitter ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div>
+                <label className="font-medium">🔥 Ludicrous Mode 🔥</label>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Increase maximum values for all controls
+                </p>
+              </div>
+              <button
+                onClick={() => setIsInsaneMode(!isInsaneMode)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  isInsaneMode 
+                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {isInsaneMode ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
           </div>
         )}
       </div>

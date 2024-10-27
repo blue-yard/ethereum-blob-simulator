@@ -21,7 +21,8 @@ const DEFAULT_CONTROLS: SimulationControls = {
   maxBlobsPerBlock: 6,
   ethPrice: 3000,
   txBytes: 180,
-  useMinimumBlobFee: false
+  useMinimumBlobFee: false,
+  useRandomJitter: false  // Add this line
 }
 
 const DEFAULT_GRID_VALUES = [100, 95, 90, 75, 20, 5, 1]

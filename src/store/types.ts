@@ -6,6 +6,7 @@ export interface SimulationControls {
   ethPrice: number
   txBytes: number
   useMinimumBlobFee: boolean
+  useRandomJitter: boolean
 }
 
 export interface GasCostGrid {

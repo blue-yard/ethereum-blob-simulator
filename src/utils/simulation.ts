@@ -7,6 +7,7 @@ interface SimulationParams {
   txBytes: number
   useMinimumBlobFee: boolean
   gasCostGrid: number[][]
+  useRandomJitter: boolean
 }
 
 interface TimePoint {
@@ -35,7 +36,7 @@ function weiToUsd(weiAmount: bigint, ethPriceUsd: number): number {
   return Number(weiAmount) * ethPriceUsd / Number(WEI_PER_ETH)
 }
 
-function interpolatePercentage(price: number, gasCostGrid: number[][]): number {
+function interpolatePercentage(price: number, gasCostGrid: number[][], useRandomJitter: boolean): number {
   // Find the two price points we're between
   let lowerIndex = PRICE_POINTS.findIndex(p => price <= p)
   
@@ -43,7 +44,12 @@ function interpolatePercentage(price: number, gasCostGrid: number[][]): number {
   if (lowerIndex === -1) return 0
   
   // If price is lower than our lowest price point
-  if (lowerIndex === 0) return gasCostGrid[0][0] / 100
+  if (lowerIndex === 0) {
+    const basePercentage = gasCostGrid[0][0] / 100
+    if (!useRandomJitter) return basePercentage
+    // Add ±10% random variation
+    return basePercentage * (1 + (Math.random() * 0.2 - 0.1))
+  }
   
   // Get the two price points and their corresponding percentages
   const lowerPrice = PRICE_POINTS[lowerIndex - 1]
@@ -62,32 +68,30 @@ function interpolatePercentage(price: number, gasCostGrid: number[][]): number {
   // Interpolate the percentage
   const percentage = lowerPercentage + (upperPercentage - lowerPercentage) * t
   
-  return percentage / 100
+  if (!useRandomJitter) return percentage / 100
+  
+  // Add ±10% random variation
+  return (percentage / 100) * (1 + (Math.random() * 0.2 - 0.1))
 }
 
-function getWillingUsers(priceUSD: number, gasCostGrid: number[][]): number {
-  return interpolatePercentage(priceUSD, gasCostGrid)
+function getWillingUsers(priceUSD: number, gasCostGrid: number[][], useRandomJitter: boolean): number {
+  return interpolatePercentage(priceUSD, gasCostGrid, useRandomJitter)
 }
 
 export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
-  console.log("params: ", params);
   const points: TimePoint[] = []
   const txPerBlob = calculateTransactionsPerBlob(params.txBytes)
   const totalPotentialTps = params.rollupCount * params.tpsPerRollup
-  const blocksPerHour = Math.floor(3600 / BLOCK_TIME) // Calculate number of blocks in an hour
-  const maxTps = txPerBlob * params.maxBlobsPerBlock;
+  const blocksPerHour = Math.floor(3600 / BLOCK_TIME)
+  const maxTps = txPerBlob * params.maxBlobsPerBlock
   
-  // Start with minimum blob fee (1 wei or 1 gwei)
   let currentBlobFee = MINIMUM_BLOB_FEE
   let currentTps = totalPotentialTps
   
   for (let blockNumber = 0; blockNumber < blocksPerHour; blockNumber++) {
-    // Calculate price per transaction in USD first
     const txPriceUsd = weiToUsd(currentBlobFee, params.ethPrice) / txPerBlob
     
-    // Update TPS based on willing users before calculating required blobs
-    const willingUsers = getWillingUsers(txPriceUsd, params.gasCostGrid)
-    console.log("tx Price: ", txPriceUsd, " willing users: ", willingUsers)
+    const willingUsers = getWillingUsers(txPriceUsd, params.gasCostGrid, params.useRandomJitter)
     currentTps = Math.min(maxTps, totalPotentialTps * willingUsers)
     
     // Calculate required blobs based on current TPS
