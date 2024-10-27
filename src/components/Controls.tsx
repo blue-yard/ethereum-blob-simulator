@@ -30,6 +30,11 @@ export function Controls() {
     }[control] || 1000
   }
 
+  const handleTargetBlobsChange = (value: number) => {
+    setControl('targetBlobsPerBlock', value)
+    setControl('maxBlobsPerBlock', value * 2)
+  }
+
   return (
     <div className="space-y-8">
       <div className="border rounded-lg overflow-hidden">
@@ -62,7 +67,7 @@ export function Controls() {
             <Slider
               label="Target Blobs per Block"
               value={controls.targetBlobsPerBlock}
-              onChange={(value) => setControl('targetBlobsPerBlock', value)}
+              onChange={handleTargetBlobsChange}
               min={1}
               max={getMaxValue('targetBlobsPerBlock')}
             />
