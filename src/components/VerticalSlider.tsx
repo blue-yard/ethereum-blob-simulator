@@ -7,11 +7,9 @@ interface VerticalSliderProps {
 }
 
 export function VerticalSlider({ value, onChange, min, max, height = "200px" }: VerticalSliderProps) {
-
-  
   return (
     <div 
-      className="flex items-center justify-center"
+      className="flex items-center justify-center relative"
       style={{ height, width: '20px' }}
     >
       <input
@@ -22,9 +20,12 @@ export function VerticalSlider({ value, onChange, min, max, height = "200px" }: 
         onChange={(e) => onChange(Number(e.target.value))}
         className="accent-primary"
         style={{
-          width: "1000px",
-          transform: 'rotate(270deg)',
-          transformOrigin: 'center',
+          width: height,
+          transform: 'rotate(-90deg)',
+          transformOrigin: '0 0',
+          position: 'absolute',
+          top: '100%',
+          left: '0%',
         }}
       />
     </div>

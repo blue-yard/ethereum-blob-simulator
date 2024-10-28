@@ -11,17 +11,17 @@ export function GasCostGrid() {
 
   const formatPrice = (price: number) => {
     if (price >= 1) return `$${price.toFixed(0)}`
-    return `$${price.toFixed(4)}`
+    return `$${price}`
   }
 
   return (
-    <div className="mt-8">
+    <div>
       <h3 className="text-lg font-medium mb-4">
         Percentage of users willing to pay up to this price
       </h3>
       <div className="flex">
         {/* Percentage labels */}
-        <div className="flex flex-col justify-between pr-2 py-4 h-[300px]">
+        <div className="flex flex-col justify-between pr-2 py-4 h-[320px]">
           {PERCENTAGES.map((percent, i) => (
             <div key={i} className="text-xs w-8">
               {percent}%
@@ -38,7 +38,7 @@ export function GasCostGrid() {
                 onChange={(value) => handleSliderChange(colIndex, value)}
                 min={0}
                 max={100}
-                height="300px"
+                height="280px"
               />
               <div className="text-xs text-center mt-2">
                 {formatPrice(price)}
