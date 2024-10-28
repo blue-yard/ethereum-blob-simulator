@@ -110,7 +110,7 @@ export function Controls() {
           onClick={() => setIsGasCostGridOpen(!isGasCostGridOpen)}
           className="w-full px-4 py-2 text-left bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex justify-between items-center"
         >
-          <span className="font-medium">Gas Cost Grid</span>
+          <span className="font-medium">User Price Sensitivity</span>
           <span className="transform transition-transform duration-200" style={{ transform: isGasCostGridOpen ? 'rotate(180deg)' : 'none' }}>▼</span>
         </button>
         
