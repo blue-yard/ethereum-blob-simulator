@@ -43,6 +43,7 @@ function interpolatePercentage(price: number, gasCostGrid: number[], useRandomJi
   
   // If price is higher than our highest price point
   if (upperIndex === -1) return 0
+  if (gasCostGrid[upperIndex] === 0) return 0
   
   // If price is at or below our lowest price point
   if (upperIndex === 0) {
