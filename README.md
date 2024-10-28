@@ -41,12 +41,15 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
    - Max blobs per block (1-200)
    - ETH price in USD
    - Transaction size in bytes
-   - Minimum blob fee toggle (1 gwei vs 1 wei)
 
 2. **Price Sensitivity Grid**
    - Vertical sliders showing percentage of users willing to transact at different price points
    - Price points range from $0.0001 to $100
    - Percentages interpolate smoothly between points
+
+3. **Advanced Settings**
+   - Add random jitter to create a more realistic simulation
+   - Toggle Ludicrous mode which enables much higher TPS / Blob / Price scaling.
 
 ### Display Metrics
 
@@ -60,6 +63,9 @@ The simulator models how Layer 2 rollups use Ethereum's blob space, taking into 
    - Blobs per block
    - Blob base fee in gwei
    - Current TPS
+
+3. **The Math**
+   - Shows all core math underlying the stats/graph.
 
 
 ## Development
@@ -85,4 +91,4 @@ npm run preview
 
 ## Deployment
 
-The simulator is automatically deployed to Netlify, [you can see it here]((https://ethereum-blob-simulator.netlify.app/))
+The simulator is automatically deployed to Netlify, [you can see it here](https://ethereum-blob-simulator.netlify.app/)
