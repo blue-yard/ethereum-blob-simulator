@@ -6,6 +6,7 @@ import { useState } from 'react'
 
 function App() {
   const [isMathDetailsOpen, setIsMathDetailsOpen] = useState(false)
+  const [isResultsOpen, setIsResultsOpen] = useState(true) // Start open by default
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -18,10 +19,24 @@ function App() {
           <Controls />
         </section>
 
-        <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Simulation Results</h2>
-          <StatsDisplay />
-          <SimulationGraph />
+        <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <button
+            onClick={() => setIsResultsOpen(!isResultsOpen)}
+            className="w-full px-6 py-4 text-left flex justify-between items-center"
+          >
+            <span className="text-xl font-semibold">Simulation Results</span>
+            <span 
+              className="transform transition-transform duration-200" 
+              style={{ transform: isResultsOpen ? 'rotate(180deg)' : 'none' }}
+            >▼</span>
+          </button>
+          
+          {isResultsOpen && (
+            <div className="p-6 border-t dark:border-gray-700">
+              <StatsDisplay />
+              <SimulationGraph />
+            </div>
+          )}
         </section>
 
         <section className="bg-white dark:bg-gray-800 rounded-lg shadow">
