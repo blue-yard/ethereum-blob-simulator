@@ -8,7 +8,7 @@ interface SimulatorStore {
   controls: SimulationControls
   gasCostGrid: GasCostGrid
   setControl: (key: keyof SimulationControls, value: number | boolean) => void
-  setGasCostGrid: (row: number, col: number, value: number) => void
+  setGasCostGrid: (idx: number, value: number) => void
   
   // Results
   results: SimulationResults
@@ -50,10 +50,10 @@ export const useStore = create<SimulatorStore>((set, get) => {
       get().updateResults()
     },
 
-    setGasCostGrid: (col: number, value: number) => {
+    setGasCostGrid: (idx: number, value: number) => {
       set(state => {
         const newGrid = [...state.gasCostGrid.grid]
-        newGrid[col] = value
+        newGrid[idx] = value
         return { gasCostGrid: { grid: newGrid } }
       })
       get().updateResults()

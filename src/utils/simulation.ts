@@ -73,7 +73,7 @@ function interpolatePercentage(price: number, gasCostGrid: number[], useRandomJi
   return (percentage / 100) * (1 + (Math.random() * 0.2 - 0.1))
 }
 
-function getWillingUsers(priceUSD: number, gasCostGrid: number[][], useRandomJitter: boolean): number {
+function getWillingUsers(priceUSD: number, gasCostGrid: number[], useRandomJitter: boolean): number {
   return interpolatePercentage(priceUSD, gasCostGrid, useRandomJitter)
 }
 

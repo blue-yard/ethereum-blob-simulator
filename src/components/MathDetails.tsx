@@ -33,7 +33,7 @@ export function MathDetails() {
         <div className="space-y-1 text-sm">
           {PRICE_POINTS.map((price: number, i: number) => (
             <div key={i}>
-              {`${gasCostGrid.grid[i]}% (${Math.floor(totalPotentialTps * gasCostGrid.grid[i] / 100)}) of users will pay up to $${price}`}
+              {`${gasCostGrid.grid[i]}% (${Math.floor(totalPotentialTps * gasCostGrid.grid[i] / 100)}) will pay up to $${price}`}
             </div>
           ))}
           
