@@ -21,7 +21,7 @@ export function MathDetails() {
       <section>
         <h3 className="font-bold mb-2">Network Stats</h3>
         <div className="space-y-1 text-sm">
-          <div>Total Potential TPS: {controls.rollupCount * controls.tpsPerRollup} ({controls.rollupCount} rollups × {controls.tpsPerRollup} TPS)</div>
+          <div>TPS Demand: {controls.rollupCount * controls.tpsPerRollup} ({controls.rollupCount} rollups × {controls.tpsPerRollup} TPS)</div>
           <div>Blobs per Block: {lastDataPoint?.blobsPerBlock.toFixed(2)}</div>
           <div>Max TPS from Blobs: {((txPerBlob * controls.targetBlobsPerBlock) / 12).toFixed(2)} ({txPerBlob} tx/blob × {controls.targetBlobsPerBlock} blobs/block ÷ 12 sec/block)</div>
           <div>Current TPS: {lastDataPoint?.actualTps.toFixed(2)}</div>
@@ -33,7 +33,7 @@ export function MathDetails() {
         <div className="space-y-1 text-sm">
           {PRICE_POINTS.map((price: number, i: number) => (
             <div key={i}>
-              {gasCostGrid.grid[0][i]}% ({Math.floor(totalPotentialTps * gasCostGrid.grid[0][i] / 100)}) of users will pay up to ${price.toFixed(4)}
+              {gasCostGrid.grid[0][i]}% ({Math.floor(totalPotentialTps * gasCostGrid.grid[0][i] / 100)}) of users will pay ${price} or more
             </div>
           ))}
         </div>
@@ -54,7 +54,7 @@ export function MathDetails() {
           <div>Blob Size: 128 KB = 131,072 bytes</div>
           <div>Transaction Size: {controls.txBytes} bytes</div>
           <div>Transactions per Blob: {txPerBlob} tx ({Math.floor(128 * 1024)} ÷ {controls.txBytes})</div>
-          <div>Transaction Price: ${txPriceUsd.toFixed(6)} (${blobBaseFeeUsd.toFixed(4)} ÷ {txPerBlob})</div>
+          <div>Avg Transaction Price: ${txPriceUsd.toFixed(6)} (${blobBaseFeeUsd.toFixed(4)} ÷ {txPerBlob})</div>
         </div>
       </section>
 
