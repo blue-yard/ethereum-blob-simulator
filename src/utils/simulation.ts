@@ -1,3 +1,5 @@
+import { PRICE_POINTS } from '../constants'
+
 interface SimulationParams {
   rollupCount: number
   tpsPerRollup: number
@@ -6,7 +8,7 @@ interface SimulationParams {
   ethPrice: number
   txBytes: number
   useMinimumBlobFee: boolean
-  gasCostGrid: number[][]
+  gasCostGrid: number[]
   useRandomJitter: boolean
 }
 
@@ -19,7 +21,6 @@ interface TimePoint {
 
 const BLOB_SIZE = 128 * 1024 // 128KB in bytes
 const BLOCK_TIME = 12 // seconds
-const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 const WEI_PER_ETH = BigInt(1e18)
 const MINIMUM_BLOB_FEE = BigInt(1e9)
 const TOTAL_ETH = 120_000_000
@@ -36,26 +37,25 @@ function weiToUsd(weiAmount: bigint, ethPriceUsd: number): number {
   return Number(weiAmount) * ethPriceUsd / Number(WEI_PER_ETH)
 }
 
-function interpolatePercentage(price: number, gasCostGrid: number[][], useRandomJitter: boolean): number {
-  // Find the two price points we're between
-  let lowerIndex = PRICE_POINTS.findIndex(p => price <= p)
+function interpolatePercentage(price: number, gasCostGrid: number[], useRandomJitter: boolean): number {
+  // Find the price point we're at or just below
+  let upperIndex = PRICE_POINTS.findIndex(p => price <= p)
   
   // If price is higher than our highest price point
-  if (lowerIndex === -1) return 0
+  if (upperIndex === -1) return 0
   
-  // If price is lower than our lowest price point
-  if (lowerIndex === 0) {
-    const basePercentage = gasCostGrid[0][0] / 100
+  // If price is at or below our lowest price point
+  if (upperIndex === 0) {
+    const basePercentage = gasCostGrid[0] / 100
     if (!useRandomJitter) return basePercentage
-    // Add ±10% random variation
     return basePercentage * (1 + (Math.random() * 0.2 - 0.1))
   }
   
   // Get the two price points and their corresponding percentages
-  const lowerPrice = PRICE_POINTS[lowerIndex - 1]
-  const upperPrice = PRICE_POINTS[lowerIndex]
-  const lowerPercentage = gasCostGrid[0][lowerIndex - 1]
-  const upperPercentage = gasCostGrid[0][lowerIndex]
+  const lowerPrice = PRICE_POINTS[upperIndex - 1]
+  const upperPrice = PRICE_POINTS[upperIndex]
+  const lowerPercentage = gasCostGrid[upperIndex - 1]
+  const upperPercentage = gasCostGrid[upperIndex]
   
   // Calculate where we are between the two price points (in log space)
   const logPrice = Math.log10(price)
@@ -65,12 +65,11 @@ function interpolatePercentage(price: number, gasCostGrid: number[][], useRandom
   // Linear interpolation in log space
   const t = (logPrice - logLower) / (logUpper - logLower)
   
-  // Interpolate the percentage
-  const percentage = lowerPercentage + (upperPercentage - lowerPercentage) * t
+  // Interpolate the percentage - removed the (1-t) to make it interpolate correctly
+  const percentage = lowerPercentage * (1 - t) + upperPercentage * t
   
   if (!useRandomJitter) return percentage / 100
   
-  // Add ±10% random variation
   return (percentage / 100) * (1 + (Math.random() * 0.2 - 0.1))
 }
 

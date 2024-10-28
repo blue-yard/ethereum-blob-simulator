@@ -1,14 +1,12 @@
 import { useStore } from '../store'
 import { VerticalSlider } from './VerticalSlider'
-
-const PRICE_POINTS = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
-const PERCENTAGES = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0]
+import { PRICE_POINTS, PERCENTAGES } from '../constants'
 
 export function GasCostGrid() {
   const { gasCostGrid, setGasCostGrid } = useStore()
 
   const handleSliderChange = (colIndex: number, value: number) => {
-      setGasCostGrid(0, colIndex, value)
+    setGasCostGrid(colIndex, value)
   }
 
   const formatPrice = (price: number) => {
@@ -19,7 +17,7 @@ export function GasCostGrid() {
   return (
     <div className="mt-8">
       <h3 className="text-lg font-medium mb-4">
-        Percentage of people that will pay this price for a transaction
+        Percentage of users willing to pay up to this price
       </h3>
       <div className="flex">
         {/* Percentage labels */}
@@ -36,7 +34,7 @@ export function GasCostGrid() {
           {PRICE_POINTS.map((price, colIndex) => (
             <div key={colIndex} className="flex flex-col items-center">
               <VerticalSlider
-                value={gasCostGrid.grid[0][colIndex]}
+                value={gasCostGrid.grid[colIndex]}
                 onChange={(value) => handleSliderChange(colIndex, value)}
                 min={0}
                 max={100}

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { SimulationControls, GasCostGrid, SimulationResults } from './types'
 import { calculateSimulationResults } from '../utils/simulation'
+import { DEFAULT_GRID_VALUES } from '../constants'
 
 interface SimulatorStore {
   // Controls
@@ -25,10 +26,8 @@ const DEFAULT_CONTROLS: SimulationControls = {
   useRandomJitter: false  // Add this line
 }
 
-const DEFAULT_GRID_VALUES = [100, 95, 90, 75, 20, 5, 1]
-
-const createDefaultGrid = (): number[][] => {
-  return Array(10).fill(0).map(() => [...DEFAULT_GRID_VALUES])
+const createDefaultGrid = (): number[] => {
+  return DEFAULT_GRID_VALUES
 }
 
 export const useStore = create<SimulatorStore>((set, get) => {
@@ -51,10 +50,10 @@ export const useStore = create<SimulatorStore>((set, get) => {
       get().updateResults()
     },
 
-    setGasCostGrid: (row: number, col: number, value: number) => {
+    setGasCostGrid: (col: number, value: number) => {
       set(state => {
         const newGrid = [...state.gasCostGrid.grid]
-        newGrid[row][col] = value
+        newGrid[col] = value
         return { gasCostGrid: { grid: newGrid } }
       })
       get().updateResults()

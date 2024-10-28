@@ -10,7 +10,7 @@ export interface SimulationControls {
 }
 
 export interface GasCostGrid {
-  grid: number[][]
+  grid: number[]
 }
 
 export interface SimulationResults {
