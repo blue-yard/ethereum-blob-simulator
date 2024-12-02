@@ -92,3 +92,10 @@ npm run preview
 ## Deployment
 
 The simulator is automatically deployed to Netlify, [you can see it here](https://ethereum-blob-simulator.netlify.app/)
+
+## FAQ
+
+### Why does the blob burn go down as the ETH price goes up?
+
+Because the price people are willing to pay to transact is in USD (as that's how most think about fees) while the actual burnt resource is ETH. 
+Imagine there are 1000 people that will pay 10c to transact. These 1000 transactions total $100 and fit into one blob. If ETH is $1000 that blob will cost and burn 0.1 ETH, while if ETH is $10k that blob will cost and burn 0.01 ETH. The same amount of money is being paid to transact, but this money puchases and burns less ETH.
