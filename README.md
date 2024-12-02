@@ -99,3 +99,7 @@ The simulator is automatically deployed to Netlify, [you can see it here](https:
 
 Because the price people are willing to pay to transact is in USD (as that's how most think about fees) while the actual burnt resource is ETH. 
 Imagine there are 1000 people that will pay 10c to transact. These 1000 transactions total $100 and fit into one blob. If ETH is $1000 that blob will cost and burn 0.1 ETH, while if ETH is $10k that blob will cost and burn 0.01 ETH. The same amount of money is being paid to transact, but this money puchases and burns less ETH.
+
+### When I set a price people are willing to pay to 0, why are there still people bidding higher than the previous price?
+
+The simulation uses interpolation between the prices to make the graph smoother and more realistic. It assumes if say 30% of people are willing to pay 10c and 0% are willing to pay $1, then somewhere between 0% and 30% of people are ok with paying 20c, 50c etc. So the average payment could be higher than 10c, but no one is paying $1. 
