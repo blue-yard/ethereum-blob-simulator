@@ -54,7 +54,7 @@ export function SimulationGraph() {
         position: 'right' as const,
         title: {
           display: true,
-          text: 'Blob Base Fee (gwei)'
+          text: 'Blob Base Fee (gwei per byte)'
         },
         grid: {
           drawOnChartArea: false,

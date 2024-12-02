@@ -37,6 +37,10 @@ function weiToUsd(weiAmount: bigint, ethPriceUsd: number): number {
   return Number(weiAmount) * ethPriceUsd / Number(WEI_PER_ETH)
 }
 
+function calculateBlobCostInWei(bytePrice: bigint): bigint {
+  return bytePrice * BigInt(BLOB_SIZE)
+}
+
 function interpolatePercentage(price: number, gasCostGrid: number[], useRandomJitter: boolean): number {
   // Find the price point we're at or just below
   let upperIndex = PRICE_POINTS.findIndex(p => price <= p)
@@ -85,16 +89,16 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
   const blocksPerHour = Math.floor(3600 / BLOCK_TIME)
   const maxTps = txPerBlob * params.maxBlobsPerBlock
   
-  let currentBlobFee = MINIMUM_BLOB_FEE
+  let currentByteFee = MINIMUM_BLOB_FEE // This is now per byte
   let currentTps = totalPotentialTps
   
   for (let blockNumber = 0; blockNumber < blocksPerHour; blockNumber++) {
-    const txPriceUsd = weiToUsd(currentBlobFee, params.ethPrice) / txPerBlob
+    const blobCostWei = calculateBlobCostInWei(currentByteFee)
+    const txPriceUsd = weiToUsd(blobCostWei, params.ethPrice) / txPerBlob
     
     const willingUsers = getWillingUsers(txPriceUsd, params.gasCostGrid, params.useRandomJitter)
     currentTps = Math.min(maxTps, totalPotentialTps * willingUsers)
     
-    // Calculate required blobs based on current TPS
     let requiredBlobs = Math.min(
       calculateRequiredBlobs(currentTps, txPerBlob),
       params.maxBlobsPerBlock
@@ -103,20 +107,18 @@ export function generateTimeSeriesData(params: SimulationParams): TimePoint[] {
     points.push({
       timestamp: blockNumber,
       blobsPerBlock: requiredBlobs,
-      blobBaseFee: Number(currentBlobFee) / 1e9, // Convert to gwei for display
+      blobBaseFee: Number(currentByteFee) / 1e9, // Convert to gwei per byte for display
       actualTps: currentTps
     })
     
-    // Update blob fee for next block if above target
     if (requiredBlobs > params.targetBlobsPerBlock) {
-      currentBlobFee = currentBlobFee * BigInt(1125) / BigInt(1000) // Exact 12.5% increase
+      currentByteFee = currentByteFee * BigInt(1125) / BigInt(1000)
     } else if (requiredBlobs < params.targetBlobsPerBlock) {
-      currentBlobFee = currentBlobFee * BigInt(1000) / BigInt(1125) // Exact 12.5% decrease
-      if (currentBlobFee < MINIMUM_BLOB_FEE) {
-        currentBlobFee = MINIMUM_BLOB_FEE
+      currentByteFee = currentByteFee * BigInt(1000) / BigInt(1125)
+      if (currentByteFee < MINIMUM_BLOB_FEE) {
+        currentByteFee = MINIMUM_BLOB_FEE
       }
     }   
-
   }
   
   return points
@@ -126,18 +128,19 @@ export function calculateSimulationResults(params: SimulationParams) {
   const timeSeriesData = generateTimeSeriesData(params)
   const lastPoint = timeSeriesData[timeSeriesData.length - 1]
   
-  // Calculate total ETH burnt per day
+  // Calculate total ETH burnt per day using full blob cost
   const blocksPerDay = 24 * 3600 / BLOCK_TIME
-  const ethBurntPerDay = lastPoint.blobBaseFee * lastPoint.blobsPerBlock * blocksPerDay / 1e9
+  const bytePriceWei = BigInt(Math.floor(lastPoint.blobBaseFee * 1e9))
+  const blobCostWei = calculateBlobCostInWei(bytePriceWei)
+  const ethBurntPerDay = Number(blobCostWei) * lastPoint.blobsPerBlock * blocksPerDay / Number(WEI_PER_ETH)
   const ethBurntPerYear = ethBurntPerDay * 365
   const ethBurntPercentagePerYear = ethBurntPerYear / TOTAL_ETH * 100
-  
-  // Total TPS is just rollups * TPS per rollup
+
   const totalTps = params.rollupCount * params.tpsPerRollup
   
   return {
-    totalTps, // Use the direct calculation instead of the last point
-    avgTxPrice: weiToUsd(BigInt(Math.floor(lastPoint.blobBaseFee * 1e9)), params.ethPrice) / 
+    totalTps,
+    avgTxPrice: weiToUsd(calculateBlobCostInWei(bytePriceWei), params.ethPrice) / 
                 calculateTransactionsPerBlob(params.txBytes),
     totalEthBurnt: ethBurntPerDay,
     ethBurntPercentagePerYear,
